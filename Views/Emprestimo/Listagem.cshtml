@@ -22,21 +22,22 @@
 
 <div class="row">
     <div class="col-md-12">
-        <table > 
+        <table class="table table-striped"> 
             <thead>
-                <tr><th>Id</th>
-                <th>Usuario</th>
-                <th>Data Empréstimo</th>
-                <th>Data Devolução</th>
-                <th>Livro</th>
-                <th>Autor</th>
-                <th></th>
+                <tr>
+                    <th>Id</th>
+                    <th scope="col">Usuario</th>
+                    <th scope="col">Data Empréstimo</th>
+                    <th scope="col">Data Devolução</th>
+                    <th scope="col">Livro</th>
+                    <th scope="col">Autor</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach(Emprestimo e in Model)
                 {
-                <tr>
+                <tr scope="row">
                     <td>@e.Id</td>
                     <td>@e.NomeUsuario</td>
                     <td>@e.DataEmprestimo.ToString("dd/MM/yyyy")</td>

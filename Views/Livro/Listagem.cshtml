@@ -21,27 +21,34 @@
 
 <div class="row">
     <div class="col-md-12">
-        <table class="table table-striped"> 
-            <thead>
-                <tr><th>Id</th>
-                <th>Titulo</th>
-                <th>Autor</th>
-                <th>Ano</th>
-                <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach(Livro l in Model)
-                {
-                <tr>
-                    <td>@l.Id</td>
-                    <td>@l.Titulo</td>
-                    <td>@l.Autor</td>
-                    <td>@l.Ano</td>
-                    <td><a href="/Livro/Edicao/@l.Id">Editar</a></td>
-                </tr>
-                }
-            </tbody>
-        </table>
+        @if (Model.Count > 0)
+        {
+            <table class="table table-striped"> 
+                <thead>
+                    <tr class="table-sucess">
+                        <th scope="col">Id</th>
+                        <th scope="col">Titulo</th>
+                        <th scope="col">Autor</th>
+                        <th scope="col">Ano</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(Livro l in Model)
+                    {
+                    <tr scope="row">
+                        <td>@l.Id</td>
+                        <td>@l.Titulo</td>
+                        <td>@l.Autor</td>
+                        <td>@l.Ano</td>
+                        <td><a href="/Livro/Edicao/@l.Id">Editar</a></td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            }
+            else{
+                <p>Nenhum registro encontrado.</p>
+            }
     </div>
 </div>
