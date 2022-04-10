@@ -1,8 +1,13 @@
-@model ICollection<Emprestimo>
+@model List<Emprestimo>
 @{
     ViewData["Title"] = "Listagem de Empréstimos";
-}
+    string Classe = "";
 
+    int FiltroPorPag = Int32.Parse(ViewData["EmprestimosPorPagina"].ToString());
+    int PaginaAtual = Int32.Parse(ViewData["PaginaAtual"].ToString());
+    int NumEmprestimoPorPag = (Model.Count<FiltroPorPag ? Model.Count : FiltroPorPag);
+    int NumTotalDePag = (Model.Count/NumEmprestimoPorPag) + (Model.Count % NumEmprestimoPorPag==0 ? 0 : 1);   
+}
 <div class="row">
     <div class="col-md-12">
     <form class="form-inline" method="POST">
@@ -15,40 +20,75 @@
         <div class="form-group mb-2 mx-sm-3">
             <input type="text" placeholder="Filtro" name="Filtro" class="form-control" />
         </div>
-        <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+
+        <div class="mr-2">
+            <select name="itensPorPagina" id="itensPorPagina">
+                <option value="10">10 livros</option>
+                <option value="15">15 livros</option>
+                <option value="30">30 livros</option>
+                <option value="50">50 livros</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary mb-2 mr-2">Pesquisar</button>
+
+        <div id="SeletorPaginas">
+            <span>Página(s):</span>
+            @for(int i=1; i<=NumTotalDePag; i++)
+            {
+                <span><a href="/Emprestimo/Listagem?PaginaAtual=@i">@i, </a></span> 
+            }
+        </div>
     </form>
     </div>
 </div>
 
 <div class="row">
     <div class="col-md-12">
-        <table class="table table-striped"> 
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th scope="col">Usuario</th>
-                    <th scope="col">Data Empréstimo</th>
-                    <th scope="col">Data Devolução</th>
-                    <th scope="col">Livro</th>
-                    <th scope="col">Autor</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach(Emprestimo e in Model)
-                {
-                <tr scope="row">
-                    <td>@e.Id</td>
-                    <td>@e.NomeUsuario</td>
-                    <td>@e.DataEmprestimo.ToString("dd/MM/yyyy")</td>
-                    <td>@e.DataDevolucao.ToString("dd/MM/yyyy")</td>
-                    <td>@e.Livro.Titulo</td>
-                    <td>@e.Livro.Autor</td>
-                    <td><a href="/Emprestimo/Edicao/@e.Id">Editar</a></td>
-                </tr>
-                }
-            </tbody>  
-        </table>
+        @if (Model.Count > 0)
+        {
+            <table class="table table-striped"> 
+                <thead>
+                    <tr class="table-sucess">
+                        <th scope="col">Id</th>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Data Empréstimo</th>
+                        <th scope="col">Data Devolução</th>
+                        <th scope="col">Livro</th>
+                        <th scope="col">Autor</th>
+                        
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for(int i = (PaginaAtual-1) * NumEmprestimoPorPag; i<(NumEmprestimoPorPag * PaginaAtual<Model.Count ? NumEmprestimoPorPag * PaginaAtual:Model.Count); i++)
+                    {
+                        if((System.DateTime.Compare(System.DateTime.Now, Model[i].DataDevolucao) > 0))
+                        {
+                            Classe = "text-danger";
+                            if(Model[i].Devolvido == true)
+                            { 
+                                Classe = "text-primary";
+                            }
+                        }
+                        else { Classe = "";}
+                    
+                    
+                    <tr class="@Classe">
+                        <td>@Model[i].Id</td>
+                        <td>@Model[i].NomeUsuario</td>
+                        <td>@Model[i].DataEmprestimo</td>
+                        <td>@Model[i].DataDevolucao</td>
+                        <td>@Model[i].Livro.Titulo</td>
+                        <td>@Model[i].Livro.Autor</td>
+                        
+                        <td><a href="/Emprestimo/Edicao/@Model[i].Id">Editar</a></td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        }
+            else{
+                <p>Nenhum registro encontrado.</p>
+            }   
     </div>
 </div>
-

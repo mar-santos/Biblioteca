@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 
 namespace Biblioteca.Models
 {
@@ -25,18 +26,17 @@ namespace Biblioteca.Models
                 emprestimo.LivroId = e.LivroId;
                 emprestimo.DataEmprestimo = e.DataEmprestimo;
                 emprestimo.DataDevolucao = e.DataDevolucao;
+                emprestimo.Devolvido = e.Devolvido;
 
                 bc.SaveChanges();
             }
         }
 
-      
-
-        public ICollection<Emprestimo> ListarTodos(FiltrosEmprestimos filtro = null)
+        public ICollection<Emprestimo> ListarTodos(FiltrosEmprestimos filtro) //Filtro não utilizado
         {
             using(BibliotecaContext bc = new BibliotecaContext())
             {
-                IQueryable<Emprestimo> query;
+                IQueryable<Emprestimo> consulta;
                 
                 if(filtro != null)
                 {
@@ -44,26 +44,25 @@ namespace Biblioteca.Models
                     switch(filtro.TipoFiltro)
                     {
                         case "Usuario":
-                            query = bc.Emprestimos.Where(l => l.NomeUsuario.Contains(filtro.Filtro));
+                            consulta = bc.Emprestimos.Include(e => e.Livro).Where(e => e.NomeUsuario.Contains(filtro.Filtro));
                         break;
 
                         case "Livro":
-                            query = bc.Emprestimos.Where(l => l.Livro.Titulo.Contains(filtro.Filtro));
+                            consulta = bc.Emprestimos.Include(e=> e.Livro).Where(e => e.Livro.Titulo.Contains(filtro.Filtro));
                         break;
 
                         default:
-                            query = bc.Emprestimos;
+                            consulta = bc.Emprestimos.Include(e => e.Livro);
                         break;
                     }
                 }
                 else
                 {
                     // caso filtro não tenha sido informado
-                    query = bc.Emprestimos;
+                    consulta = bc.Emprestimos.Include(e => e.Livro);
                 }
-                
-                //ordenação padrão
-                return query.Include(e => e.Livro).ToList().OrderBy(e => e.NomeUsuario).ToList();
+
+                return consulta.OrderByDescending(e => e.DataDevolucao).ToList();
             }
         }
 
@@ -74,5 +73,6 @@ namespace Biblioteca.Models
                 return bc.Emprestimos.Find(id);
             }
         }
+
     }
 }
